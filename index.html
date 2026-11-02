@@ -121,34 +121,54 @@ Silakan tulis pesan untuk memulai.
 <footer>© 2026 ChatAi</footer>
 
 <script>
-function sendMessage(){
- const input=document.getElementById("message");
- const output=document.getElementById("output");
- const message=input.value.trim();
 
- if(!message)return;
+ 
+async function sendMessage() {
+  const input = document.getElementById("message");
+  const output = document.getElementById("output");
+  const message = input.value.trim();
 
- const user=document.createElement("div");
- user.className="msg";
- user.textContent="Kamu: "+message;
- output.appendChild(user);
+  if (!message) return;
 
- const bot=document.createElement("div");
- bot.className="msg bot";
- bot.textContent=
- "ChatAi: Terima kasih sudah mengirim pesan! "+
- "Saat ini website masih dalam mode demo. "+
- "Koneksi AI sungguhan akan ditambahkan berikutnya.";
+  const user = document.createElement("div");
+  user.className = "msg";
+  user.textContent = "Kamu: " + message;
+  output.appendChild(user);
 
- output.appendChild(bot);
- input.value="";
- output.scrollTop=output.scrollHeight;
+  const bot = document.createElement("div");
+  bot.className = "msg bot";
+  bot.textContent = "ChatAi sedang memproses...";
+  output.appendChild(bot);
+
+  input.value = "";
+  output.scrollTop = output.scrollHeight;
+
+  try {
+    const response = await fetch(
+      "https://chatai-server.darum895.workers.dev/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      }
+    );
+
+    const data = await response.json();
+    bot.textContent = "ChatAi: " + data.reply;
+  } catch (error) {
+    bot.textContent = "ChatAi: Koneksi server gagal.";
+  }
+
+  output.scrollTop = output.scrollHeight;
 }
 
 document.getElementById("message")
-.addEventListener("keydown",function(e){
- if(e.key==="Enter")sendMessage();
-});
+  .addEventListener("keydown", function(e) {
+    if (e.key === "Enter") sendMessage();
+  });
+
 </script>
 
 </body>
